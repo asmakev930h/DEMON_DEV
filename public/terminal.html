@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal</title>
+</head>
+<body>
+  <h1>Welcome to Your Terminal</h1>
+  <form id="commandForm">
+    <label for="command">Enter Command:</label>
+    <input type="text" id="command" name="command" required>
+    <button type="submit">Run</button>
+  </form>
+  <pre id="output"></pre>
+
+  <script>
+    const queryParams = new URLSearchParams(window.location.search);
+    const username = queryParams.get("username");
+    const token = queryParams.get("token");
+
+    if (!username || !token) {
+      alert("Unauthorized access!");
+      window.location.href = "/";
+    }
+
+    document.getElementById("commandForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const command = document.getElementById("command").value;
+
+      fetch("/execute?username=" + username + "&token=" + token, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command }),
+      })
+        .then((response) => response.text())
+        .then((data) => {
+          document.getElementById("output").textContent = data;
+        })
+        .catch((err) => {
+          document.getElementById("output").textContent = `Error: ${err.message}`;
+        });
+    });
+  </script>
+</body>
+</html>
